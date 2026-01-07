@@ -1,0 +1,7 @@
+{
+  "name": "SuperScanner AI - Kiểm tra sản phẩm siêu thị",
+  "description": "Ứng dụng thông minh kiểm tra sản phẩm siêu thị sử dụng AI để quét mã vạch và nhận diện sản phẩm, tích hợp bảng quản trị kho hàng.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
