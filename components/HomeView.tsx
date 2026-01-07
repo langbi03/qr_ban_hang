@@ -1,65 +1,91 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Scan, ShieldCheck, Zap, Info } from 'lucide-react';
+import { Scan, ShieldCheck, Zap, Box, Plus } from 'lucide-react';
 import { getProducts } from '../store';
-import { AppRoute } from '../types';
+import { AppRoute, Product } from '../types';
 
-const HomeView: React.FC = () => {
+interface HomeViewProps {
+  onAddToCart: (product: Product) => void;
+}
+
+const HomeView: React.FC<HomeViewProps> = ({ onAddToCart }) => {
   const navigate = useNavigate();
-  const products = getProducts().slice(0, 3);
+  const products = getProducts().slice(0, 5);
+
+  const handleQuickAdd = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+    onAddToCart(product);
+  };
 
   return (
     <div className="p-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="mb-8">
-        <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Xin chào!</h2>
-        <p className="text-gray-500 text-lg leading-relaxed">Quét bất kỳ sản phẩm nào trong siêu thị để xem chi tiết ngay lập tức.</p>
+      <div className="mb-10 mt-4">
+        <h2 className="text-4xl font-black text-slate-900 mb-2 leading-none">SmartPocket</h2>
+        <p className="text-slate-500 font-medium">Trợ lý quản lý sản phẩm thông minh của bạn.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-10">
-        <div className="bg-blue-50 p-4 rounded-2xl flex flex-col gap-2">
-          <Zap className="text-blue-600 w-6 h-6" />
-          <h3 className="font-bold text-blue-900">Quét Nhanh</h3>
-          <p className="text-xs text-blue-700 leading-tight">Nhận diện mã vạch & mặt hàng tức thì bằng AI.</p>
+        <div className="bg-white p-5 rounded-[28px] flex flex-col gap-3 shadow-sm border border-slate-100 group hover:border-indigo-200 transition-all">
+          <div className="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+            <Zap className="w-5 h-5 fill-current" />
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-800 text-sm">Quét AI</h3>
+            <p className="text-[11px] text-slate-400 leading-tight mt-1">Nhận diện mã vạch và vật phẩm tức thì.</p>
+          </div>
         </div>
-        <div className="bg-green-50 p-4 rounded-2xl flex flex-col gap-2">
-          <ShieldCheck className="text-green-600 w-6 h-6" />
-          <h3 className="font-bold text-green-900">Xác thực</h3>
-          <p className="text-xs text-green-700 leading-tight">Thông tin trực tiếp từ cơ sở dữ liệu kho hàng.</p>
+        <div className="bg-white p-5 rounded-[28px] flex flex-col gap-3 shadow-sm border border-slate-100 group hover:border-indigo-200 transition-all">
+          <div className="w-10 h-10 bg-teal-50 rounded-2xl flex items-center justify-center text-teal-600">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-800 text-sm">Bảo mật</h3>
+            <p className="text-[11px] text-slate-400 leading-tight mt-1">Thông tin minh bạch, chính xác 100%.</p>
+          </div>
         </div>
       </div>
 
       <button 
         onClick={() => navigate(AppRoute.SCAN)}
-        className="w-full bg-green-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl hover:bg-green-700 active:scale-[0.98] transition-all mb-10"
+        className="w-full bg-indigo-600 text-white py-5 rounded-[28px] font-black text-lg flex items-center justify-center gap-3 shadow-2xl shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all mb-12"
       >
         <Scan className="w-6 h-6" />
         BẮT ĐẦU QUÉT
       </button>
 
       <section>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-xl text-gray-800">Sản phẩm nổi bật</h3>
-          <span className="text-green-600 text-sm font-semibold">Xem tất cả</span>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-black text-xl text-slate-900 flex items-center gap-2">
+            <Box className="w-5 h-5 text-indigo-600" />
+            Mới cập nhật
+          </h3>
         </div>
         <div className="space-y-4">
           {products.map(product => (
             <div 
               key={product.id} 
               onClick={() => navigate(`/product/${product.id}`)}
-              className="flex items-center gap-4 bg-white p-3 rounded-xl border border-gray-100 hover:border-green-200 transition-all cursor-pointer shadow-sm group"
+              className="flex items-center gap-4 bg-white p-4 rounded-[28px] border border-slate-50 hover:border-indigo-100 transition-all cursor-pointer shadow-sm group relative"
             >
-              <img 
-                src={product.imageUrl} 
-                alt={product.name} 
-                className="w-20 h-20 object-cover rounded-lg group-hover:scale-105 transition-transform" 
-              />
-              <div className="flex-1">
-                <h4 className="font-bold text-gray-800 line-clamp-1">{product.name}</h4>
-                <p className="text-xs text-gray-500 mb-1">{product.category}</p>
-                <p className="text-green-600 font-bold">{product.price.toLocaleString('vi-VN')} ₫</p>
+              <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-inner bg-slate-100">
+                <img 
+                  src={product.imageUrl} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                />
               </div>
-              <Info className="w-5 h-5 text-gray-300" />
+              <div className="flex-1">
+                <h4 className="font-bold text-slate-800 text-sm line-clamp-1 pr-10">{product.name}</h4>
+                <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">{product.category}</p>
+                <p className="text-indigo-600 font-black text-lg mt-1">{product.price.toLocaleString('vi-VN')} ₫</p>
+              </div>
+              <button 
+                onClick={(e) => handleQuickAdd(e, product)}
+                className="absolute top-4 right-4 w-10 h-10 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
             </div>
           ))}
         </div>

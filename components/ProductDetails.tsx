@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Share2, Heart, ShieldCheck, MapPin, Package, Tag, Sparkles, QrCode, Download, Loader2 } from 'lucide-react';
+import { ChevronLeft, Share2, Heart, ShieldCheck, MapPin, Package, Tag, Sparkles, QrCode, Download, Loader2, ShoppingCart } from 'lucide-react';
 import { getProducts } from '../store';
 import { Product } from '../types';
 import { generateProductDescription } from '../services/geminiService';
@@ -26,7 +26,11 @@ const LoaderIcon = (props: any) => {
   );
 };
 
-const ProductDetails: React.FC = () => {
+interface ProductDetailsProps {
+  onAddToCart: (product: Product) => void;
+}
+
+const ProductDetails: React.FC<ProductDetailsProps> = ({ onAddToCart }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
@@ -183,8 +187,12 @@ const ProductDetails: React.FC = () => {
           <button className="flex-1 border-2 border-green-600 flex items-center justify-center p-3 rounded-2xl font-bold text-green-600 hover:bg-green-50 transition-colors cursor-pointer text-center">
             Tìm tương tự
           </button>
-          <button className="flex-1 bg-green-600 flex items-center justify-center p-3 rounded-2xl font-bold text-white shadow-lg shadow-green-200 hover:bg-green-700 active:scale-95 transition-all cursor-pointer text-center">
-            Thêm vào DS
+          <button 
+            onClick={() => onAddToCart(product)}
+            className="flex-1 bg-green-600 flex items-center justify-center p-3 rounded-2xl font-bold text-white shadow-lg shadow-green-200 hover:bg-green-700 active:scale-95 transition-all cursor-pointer text-center gap-2"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            Thêm vào giỏ
           </button>
         </div>
       </div>

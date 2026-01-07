@@ -4,13 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Camera, X, Loader2, Zap, ZapOff, 
   FlipHorizontal, History, CheckCircle2, 
-  AlertCircle, ChevronRight, ScanLine, Maximize
+  AlertCircle, ChevronRight, ScanLine, ShoppingCart, Plus
 } from 'lucide-react';
 import { analyzeProductImage, ScanAIResult } from '../services/geminiService';
 import { findProductByBarcode, findProductByName } from '../store';
 import { Product } from '../types';
 
-const Scanner: React.FC = () => {
+interface ScannerProps {
+  onAddToCart: (product: Product) => void;
+}
+
+const Scanner: React.FC<ScannerProps> = ({ onAddToCart }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -48,6 +52,13 @@ const Scanner: React.FC = () => {
     }
   };
 
+  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+    onAddToCart(product);
+    // Vibrate to confirm
+    if ('vibrate' in navigator) navigator.vibrate(50);
+  };
+
   const processFrame = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current || isScanning) return;
 
@@ -57,7 +68,6 @@ const Scanner: React.FC = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
     
-    // Tối ưu khung hình quét (Center Crop)
     const size = Math.min(video.videoWidth, video.videoHeight, 800);
     canvas.width = size;
     canvas.height = size;
@@ -88,8 +98,7 @@ const Scanner: React.FC = () => {
           setHistory(prev => [product!, ...prev.filter(p => p.id !== product!.id)].slice(0, 5));
           if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
           
-          // Sau 3 giây thành công thì quay lại trạng thái idle để quét tiếp
-          setTimeout(() => setStatus('idle'), 3000);
+          setTimeout(() => setStatus('idle'), 4000);
         } else {
           setStatus(result.type !== 'unknown' ? 'not_found' : 'idle');
         }
@@ -115,7 +124,6 @@ const Scanner: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-black text-white overflow-hidden">
-      {/* Viewfinder Header */}
       <div className="absolute top-0 inset-x-0 z-30 p-6 flex justify-between items-start pointer-events-none">
         <div className="flex flex-col gap-1 pointer-events-auto">
           <div className={`px-4 py-1.5 rounded-full border backdrop-blur-md transition-all duration-500 flex items-center gap-2 ${
@@ -140,7 +148,6 @@ const Scanner: React.FC = () => {
         </button>
       </div>
 
-      {/* Camera Core */}
       <div className="relative flex-1 flex items-center justify-center">
         <video 
           ref={videoRef} 
@@ -148,24 +155,20 @@ const Scanner: React.FC = () => {
           className={`w-full h-full object-cover transition-opacity duration-700 ${isScanning ? 'opacity-60' : 'opacity-100'} ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`} 
         />
         
-        {/* Overlay Scanner UI */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className={`relative w-72 h-72 transition-all duration-700 ${
             status === 'success' ? 'scale-110' : 'scale-100'
           }`}>
-            {/* Corner Brackets */}
             <div className={`absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 rounded-tl-3xl transition-colors duration-500 ${status === 'success' ? 'border-green-400' : 'border-white/30'}`} />
             <div className={`absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 rounded-tr-3xl transition-colors duration-500 ${status === 'success' ? 'border-green-400' : 'border-white/30'}`} />
             <div className={`absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 rounded-bl-3xl transition-colors duration-500 ${status === 'success' ? 'border-green-400' : 'border-white/30'}`} />
             <div className={`absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 rounded-br-3xl transition-colors duration-500 ${status === 'success' ? 'border-green-400' : 'border-white/30'}`} />
 
-            {/* Scanning Animation */}
             <div className={`absolute inset-0 rounded-3xl overflow-hidden`}>
               <div className={`absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-green-400 to-transparent shadow-[0_0_15px_rgba(74,222,128,1)] animate-[scan_2.5s_infinite_ease-in-out] ${status === 'success' ? 'hidden' : 'block'}`} />
               <div className="absolute inset-0 bg-white/5 backdrop-invert-[0.05]" />
             </div>
 
-            {/* Success Visual */}
             {status === 'success' && (
               <div className="absolute inset-0 flex items-center justify-center animate-in zoom-in-50 duration-300">
                 <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(34,197,94,0.6)]">
@@ -176,7 +179,6 @@ const Scanner: React.FC = () => {
           </div>
         </div>
 
-        {/* Error Notification */}
         {error && (
           <div className="absolute bottom-32 left-6 right-6 bg-red-500/90 backdrop-blur-xl p-4 rounded-2xl flex items-center gap-3 shadow-2xl animate-in slide-in-from-bottom-4">
             <AlertCircle className="w-5 h-5" />
@@ -187,9 +189,7 @@ const Scanner: React.FC = () => {
 
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Control & History Panel */}
       <div className="bg-zinc-950 p-6 pb-12 rounded-t-[40px] border-t border-white/10 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] z-40">
-        {/* Match Preview Card */}
         {status === 'success' && lastMatch && (
           <div 
             onClick={() => navigate(`/product/${lastMatch.id}`)}
@@ -200,13 +200,15 @@ const Scanner: React.FC = () => {
               <h4 className="font-black text-sm truncate">{lastMatch.name}</h4>
               <p className="text-green-600 font-black text-base">{lastMatch.price.toLocaleString()} ₫</p>
             </div>
-            <div className="bg-zinc-100 p-2 rounded-xl">
-              <ChevronRight className="w-5 h-5 text-zinc-400" />
-            </div>
+            <button 
+              onClick={(e) => handleAddToCart(e, lastMatch)}
+              className="bg-green-600 text-white p-3 rounded-2xl shadow-lg active:scale-90 transition-transform"
+            >
+              <Plus className="w-6 h-6" />
+            </button>
           </div>
         )}
 
-        {/* Action Bar */}
         <div className="flex items-center justify-between max-w-sm mx-auto mb-8">
           <button 
             onClick={() => setIsAutoMode(!isAutoMode)}
@@ -240,12 +242,11 @@ const Scanner: React.FC = () => {
           </button>
         </div>
 
-        {/* History Strip */}
         {history.length > 0 && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex items-center gap-2 mb-4">
-              <History className="w-3 h-3 text-zinc-500" />
-              <span className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em]">Lịch sử vừa quét</span>
+              <ShoppingCart className="w-3 h-3 text-zinc-500" />
+              <span className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em]">Quét gần đây</span>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
               {history.map(p => (
@@ -256,9 +257,12 @@ const Scanner: React.FC = () => {
                 >
                   <div className="relative">
                     <img src={p.imageUrl} className="w-14 h-14 rounded-2xl object-cover border border-white/10" alt="" />
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-zinc-950 flex items-center justify-center">
-                      <CheckCircle2 className="w-2 h-2 text-white" />
-                    </div>
+                    <button 
+                      onClick={(e) => handleAddToCart(e, p)}
+                      className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-zinc-950 flex items-center justify-center shadow-lg"
+                    >
+                      <Plus className="w-3 h-3 text-white" />
+                    </button>
                   </div>
                   <span className="text-[8px] font-bold text-zinc-400 max-w-[56px] truncate">{p.name}</span>
                 </div>

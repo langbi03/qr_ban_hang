@@ -1,6 +1,6 @@
 {
-  "name": "SuperScanner AI - Kiểm tra sản phẩm siêu thị",
-  "description": "Ứng dụng thông minh kiểm tra sản phẩm siêu thị sử dụng AI để quét mã vạch và nhận diện sản phẩm, tích hợp bảng quản trị kho hàng.",
+  "name": "SmartPocket AI",
+  "description": "Trợ lý quản lý sản phẩm cá nhân và kiểm tra kho hàng thông minh sử dụng Gemini AI.",
   "requestFramePermissions": [
     "camera"
   ]

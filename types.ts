@@ -11,6 +11,10 @@ export interface Product {
   origin: string;
 }
 
+export interface CartItem extends Product {
+  quantity: number;
+}
+
 export interface User {
   username: string;
   role: 'admin' | 'user';
@@ -19,6 +23,7 @@ export interface User {
 export enum AppRoute {
   HOME = '/',
   SCAN = '/scan',
+  CART = '/cart',
   ADMIN_LOGIN = '/login',
   ADMIN_DASHBOARD = '/admin',
   PRODUCT_DETAILS = '/product/:id'

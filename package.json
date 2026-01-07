@@ -1,25 +1,26 @@
+
 {
-  "name": "superscanner-ai---kiểm-tra-sản-phẩm-siêu-thị",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "smart-pocket-ai",
+  "version": "1.0.0",
+  "description": "SmartPocket AI - Trợ lý quản lý sản phẩm thông minh",
+  "main": "main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "@google/genai": "^1.33.0",
-    "lucide-react": "^0.561.0",
-    "react-router-dom": "^7.10.1",
-    "qrcode.react": "^3.1.0"
+    "start": "electron .",
+    "build": "electron-builder --win portable"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.smartpocket.ai",
+    "productName": "SmartPocketAI",
+    "win": {
+      "target": "portable",
+      "icon": "icon.ico"
+    },
+    "directories": {
+      "output": "dist_exe"
+    }
   }
 }
